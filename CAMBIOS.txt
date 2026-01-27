@@ -1,0 +1,9 @@
+separar campos DE TRANFERENCIAS Y DEBITOS
+
+quitar la opción de créditos 
+
+configurar la hora de apertura con la hora real del sistema
+
+quitar los segundos de la hora que aparece en donde se ven las facturas
+
+y que en el cierre de caja solo se sume la base mas el efectivo menos los gastos excluyendo transferencias y débitos 
