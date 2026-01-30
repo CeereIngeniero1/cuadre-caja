@@ -1,0 +1,527 @@
+:root {
+  /* Paleta Indigo & Slate */
+  --primary: #4f46e5;
+  --primary-hover: #4338ca;
+  --bg-app: #f8fafc;
+  --card-bg: #ffffff;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --border-light: #e2e8f0;
+
+  /* Estados */
+  --success-bg: #dcfce7;
+  --success-text: #15803d;
+  --error-bg: #fee2e2;
+  --error-text: #b91c1c;
+
+  /* Efectos */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --radius-md: 12px;
+  --radius-full: 9999px;
+
+  /* Fuentes */
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-display: 'Outfit', system-ui, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background-color: var(--bg-app);
+  color: var(--text-main);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* --- Layout --- */
+.topbar {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-light);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.topbar-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+h1 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: var(--text-main);
+  margin: 0;
+  background: linear-gradient(135deg, #4f46e5 0%, #0ea5e9 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 1.5rem;
+}
+
+/* --- Tablas --- */
+.table-wrapper {
+  background: var(--card-bg);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  border: 1px solid var(--border-light);
+}
+
+.cajas-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9375rem;
+}
+
+.cajas-table thead th {
+  background: #f1f5f9;
+  text-align: left;
+  padding: 1rem 1.25rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+}
+
+.cajas-table tbody tr {
+  border-bottom: 1px solid var(--border-light);
+  transition: background-color 0.15s ease;
+}
+
+.cajas-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.cajas-table tbody tr:hover {
+  background-color: #f8fafc;
+}
+
+.cajas-table td {
+  padding: 1rem 1.25rem;
+  color: var(--text-main);
+}
+
+/* --- Botones --- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-full);
+  font-weight: 500;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  font-family: var(--font-sans);
+  text-decoration: none;
+}
+
+.btn.primary {
+  background-color: var(--primary);
+  color: white;
+  box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
+}
+
+.btn.primary:hover {
+  background-color: var(--primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 8px -1px rgba(79, 70, 229, 0.3);
+}
+
+.btn.secondary {
+  background-color: white;
+  color: var(--text-main);
+  border: 1px solid var(--border-light);
+}
+
+.btn.secondary:hover {
+  background-color: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+.action-pill {
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px solid var(--border-light);
+  background: white;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.action-pill:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: #eef2ff;
+}
+
+/* --- Modales --- */
+.modal {
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 0;
+  width: 100%;
+  max-width: 600px;
+  box-shadow: var(--shadow-lg);
+  background: var(--card-bg);
+  animation: modalIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal::backdrop {
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(4px);
+  animation: fadeIn 0.3s ease;
+}
+
+.modal-header {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--border-light);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fafafa;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  color: var(--text-main);
+}
+
+.modal-close {
+  background: transparent;
+  border: none;
+  font-size: 1.25rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+}
+
+.modal-close:hover {
+  background: #e2e8f0;
+  color: var(--text-main);
+}
+
+.modal-body {
+  padding: 1.5rem;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.modal-footer {
+  padding: 1.25rem 1.5rem;
+  background: #fafafa;
+  border-top: 1px solid var(--border-light);
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+/* --- Formularios --- */
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-main);
+  margin-bottom: 0.5rem;
+}
+
+input[type="text"],
+input[type="number"] {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-light);
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+/* --- Ventas Table (Modal) --- */
+.ventas-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.ventas-table th {
+  text-align: left;
+  padding: 0.75rem;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-bottom: 2px solid var(--border-light);
+}
+
+.ventas-table td {
+  padding: 0.75rem;
+  border-bottom: 1px solid var(--border-light);
+  white-space: nowrap;
+}
+
+.ventas-table td span {
+  white-space: nowrap;
+}
+
+.total-row td {
+  font-weight: 700;
+  color: var(--text-main);
+  background: #f8fafc;
+}
+
+/* --- Masked Dots --- */
+.masked-dots {
+  display: block;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: #f1f5f9;
+  border-radius: 8px;
+  color: var(--text-muted);
+  font-size: 1.25rem;
+  letter-spacing: 4px;
+  text-align: center;
+  border: 1px dashed #cbd5e1;
+}
+
+/* --- Informe / Report Style --- */
+.report-summary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.report-card {
+  background: var(--bg-app);
+  padding: 1.25rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-light);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.report-card.primary {
+  background: #eef2ff;
+  border-color: #c7d2fe;
+}
+
+.report-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.025em;
+}
+
+.report-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-main);
+  font-family: var(--font-display);
+}
+
+.report-card.primary .report-value {
+  color: var(--primary);
+}
+
+.section-title {
+  font-size: 0.875rem;
+  font-weight: 700;
+  margin: 1.5rem 0 0.75rem 0;
+  color: var(--text-main);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* --- Animaciones --- */
+@keyframes modalIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* --- Ticket de Cierre (Térmico) --- */
+.ticket-container {
+  padding: 20px;
+  background: #fff;
+  color: #000;
+  text-align: left;
+}
+
+.ticket-header {
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+/* --- Responsive --- */
+@media (max-width: 640px) {
+  .row {
+    grid-template-columns: 1fr;
+  }
+
+  .report-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .topbar-inner {
+    padding: 1rem;
+  }
+
+  .modal {
+    max-width: 100%;
+    height: 100%;
+    border-radius: 0;
+  }
+}
+
+/* --- Print Styles --- */
+@media print {
+  @page {
+    margin: 0;
+    size: auto;
+  }
+
+  body {
+    background: white;
+    color: black;
+  }
+
+  body * {
+    visibility: hidden;
+  }
+
+  #dlgInforme,
+  #dlgInforme *,
+  #dlgTicket,
+  #dlgTicket * {
+    visibility: visible;
+    color: black !important;
+    text-shadow: none !important;
+    filter: none !important;
+  }
+
+  #dlgInforme,
+  #dlgTicket {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    background: white !important;
+  }
+
+  /* Ajustes específicos para Ticket Térmico */
+  #dlgTicket .ticket-container {
+    width: 72mm !important;
+    /* Un poco menos de 80mm para margenes */
+    max-width: 100%;
+    margin: 0 auto;
+    font-family: 'Courier New', Courier, monospace;
+    /* Fuente monoespaciada para mejor alineación */
+    font-weight: bold;
+    /* Negrita para mejor impresión térmica */
+    font-size: 14px;
+    line-height: 1.2;
+  }
+
+  #dlgTicket .ticket-header h3 {
+    font-size: 18px;
+    font-weight: 900;
+    text-transform: uppercase;
+  }
+
+  #dlgTicket .ticket-row {
+    border-bottom: 1px dashed black;
+    /* Usar bordes simples */
+    padding: 5px 0;
+  }
+
+  .report-card {
+    border: 1px solid black !important;
+    background: white !important;
+    color: black !important;
+  }
+
+  .report-value,
+  .report-label,
+  h3,
+  h2,
+  span,
+  div {
+    color: black !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .modal-close,
+  .modal-footer,
+  .no-print {
+    display: none !important;
+  }
+
+  .modal-body {
+    max-height: none !important;
+    overflow: visible !important;
+  }
+}

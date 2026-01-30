@@ -1,0 +1,24 @@
+{
+    "name": "cuadre-caja-app",
+    "version": "1.0.0",
+    "description": "Aplicacion para gestionar el cuadre de caja",
+    "main": "server.js",
+    "scripts": {
+        "start": "node server.js",
+        "dev": "nodemon server.js"
+    },
+    "dependencies": {
+        "cors": "^2.8.5",
+        "dotenv": "^16.6.1",
+        "exp": "^57.2.1",
+        "express": "^4.21.2",
+        "mssql": "^9.3.2",
+        "pnpm": "^10.27.0"
+    },
+    "devDependencies": {
+        "nodemon": "^3.1.10"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC"
+}

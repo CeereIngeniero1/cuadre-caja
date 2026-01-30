@@ -1,0 +1,399 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Cuadres de caja</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;700&display=swap"
+    rel="stylesheet">
+</head>
+
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <h1>Cuadres de Caja</h1>
+      <button id="btnAbrirCaja" class="btn primary">Abrir caja</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="grid">
+      <table id="tblCajas" class="cajas-table" aria-label="Listado de cuadres de caja">
+        <thead>
+          <tr>
+            <th>Fecha Inicio</th>
+            <th>Fecha Fin</th>
+            <th>Responsable</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+            <th>Facturas</th>
+            <th>Ticket</th>
+            <th>Informes</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+  </main>
+
+
+
+
+
+  <!-- Modal Abrir Caja (modificado: sin "maquina", total enmascarado) -->
+  <dialog id="dlgAbrir" class="modal">
+    <form method="dialog" id="formAbrir" class="modal-form">
+      <header class="modal-header">
+        <h3>Abrir caja</h3>
+        <button type="button" class="modal-close" data-close="abrir">✕</button>
+      </header>
+
+      <div class="modal-body">
+        <div class="row">
+          <label>Responsable *
+            <input id="abrirResponsable" type="text" placeholder="Documento Usuario (Ej: 70123456)" required>
+          </label>
+          <!-- eliminado: Identificación máquina -->
+          <label>Documento empresa *
+            <input id="abrirDocumentoEmpresa" type="text" placeholder="NIT o código" required>
+          </label>
+        </div>
+
+        <div class="row">
+          <label>Terminal (opcional)
+            <input id="abrirTerminal" type="number" min="0" placeholder="Id terminal" autocomplete="off" />
+          </label>
+        </div>
+
+        <label>Total inicial (opcional)
+          <!-- input real oculto visualmente (pero accesible). Usamos type="text" para controlar el formato. -->
+          <input id="abrirTotalInicial" type="text" inputmode="decimal" placeholder="0" autocomplete="off" />
+        </label>
+
+        <!-- representación con puntos: una fila visual que muestra • por cada caracter -->
+        <div class="masked-row" aria-hidden="true">
+          <div id="maskedDots" class="masked-dots" title="Cantidad enmascarada">•</div>
+        </div>
+
+        <!-- botón para alternar visualización (opcional) -->
+        <div style="margin-top:10px;">
+          <label style="font-size:13px; color:#666; cursor:pointer;">
+            <input id="toggleMostrarTotal" type="checkbox" style="margin-right:8px;">
+            Mostrar total mientras escribe
+          </label>
+        </div>
+      </div>
+
+      <footer class="modal-footer">
+        <button id="btnGuardarAbrir" class="btn primary">Abrir caja</button>
+      </footer>
+    </form>
+  </dialog>
+
+
+
+
+
+
+  <!-- Modal Cerrar Caja -->
+  <dialog id="dlgCerrar" class="modal">
+    <form method="dialog" id="formCerrar" class="modal-form">
+      <header class="modal-header">
+        <h3>Cerrar caja</h3>
+        <button type="button" class="modal-close" data-close="cerrar">✕</button>
+      </header>
+
+      <div class="modal-body">
+        <p><strong>Responsable:</strong> <span id="cerrarResponsableText">-</span></p>
+        <p><strong>Fecha inicio:</strong> <span id="cerrarFechaInicio">-</span></p>
+
+        <h4 class="section-title">Auditoría de Efectivo y Medios de Pago</h4>
+        <p style="font-size: 0.82rem; color: #64748b; margin-bottom: 12px; line-height: 1.4;">
+          Reporta el total de dinero físico y vouchers que tienes <strong>en este momento</strong>.
+        </p>
+
+        <div style="overflow-x: auto; margin-top: 10px; border: 1px solid #e2e8f0; border-radius: 8px;">
+          <table class="ventas-table" id="tablaCerrar"
+            style="width: 100%; border-collapse: collapse; min-width: 450px;">
+            <thead>
+              <tr style="background-color: #f8fafc; border-bottom: 2px solid #e2e8f0;">
+                <th style="text-align: left; padding: 10px;">Concepto</th>
+                <th style="text-align: right; padding: 10px; width: 120px;">Reportado</th>
+                <th style="text-align: right; padding: 10px; width: 120px;">Sistema</th>
+                <th style="text-align: right; padding: 10px; width: 100px;">Dif.</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="base-row" style="background-color: #fcfcfc; border-bottom: 1px solid #f1f5f9;">
+                <td style="padding: 10px;"><strong>(+) Base Inicial</strong></td>
+                <td style="text-align: right; color: #94a3b8; padding: 10px;">- <span id="cerrarBase"
+                    style="display:none;">0</span></td>
+                <td style="text-align: right; padding: 10px;"><span id="sysBase"
+                    style="color: #475569; font-weight: bold;">$ 0</span></td>
+                <td style="text-align: right; padding: 10px; color: #94a3b8;">-</td>
+              </tr>
+              <tr style="border-bottom: 1px solid #f1f5f9;">
+                <td style="padding: 10px;">(+) Efectivo</td>
+                <td style="text-align: right; padding: 10px;">
+                  <input id="cerrarEfectivo" type="number" min="0" step="1" value="0"
+                    style="text-align: right; width: 100px; padding: 4px; border: 1px solid #cbd5e1; border-radius: 4px;">
+                </td>
+                <td style="text-align: right; padding: 10px;"><span id="sysEfectivo">$ 0</span></td>
+                <td style="text-align: right; padding: 10px;"><span id="diffEfectivo">$ 0</span></td>
+              </tr>
+              <tr style="border-bottom: 1px solid #f1f5f9;">
+                <td style="padding: 10px;">(+) Débito</td>
+                <td style="text-align: right; padding: 10px;">
+                  <input id="cerrarDebito" type="number" min="0" step="1" value="0"
+                    style="text-align: right; width: 100px; padding: 4px; border: 1px solid #cbd5e1; border-radius: 4px;">
+                </td>
+                <td style="text-align: right; padding: 10px;"><span id="sysDebito">$ 0</span></td>
+                <td style="text-align: right; padding: 10px;"><span id="diffDebito">$ 0</span></td>
+              </tr>
+              <tr style="border-bottom: 1px solid #f1f5f9;">
+                <td style="padding: 10px;">(+) Transferencia</td>
+                <td style="text-align: right; padding: 10px;">
+                  <input id="cerrarTransf" type="number" min="0" step="1" value="0"
+                    style="text-align: right; width: 100px; padding: 4px; border: 1px solid #cbd5e1; border-radius: 4px;">
+                </td>
+                <td style="text-align: right; padding: 10px;"><span id="sysTransf">$ 0</span></td>
+                <td style="text-align: right; padding: 10px;"><span id="diffTransf">$ 0</span></td>
+              </tr>
+              <tr style="background-color: #fff1f2; border-bottom: 2px solid #e2e8f0;">
+                <td style="padding: 10px;"><strong>(-) Gastos</strong></td>
+                <td style="text-align: right; color: #94a3b8; padding: 10px;">-</td>
+                <td style="text-align: right; padding: 10px;"><span id="sysEgresos"
+                    style="color: #e11d48; font-weight: bold;">$ 0</span></td>
+                <td style="text-align: right; padding: 10px; color: #94a3b8;">-</td>
+              </tr>
+              <tr class="total-row" style="background-color: #f1f5f9;">
+                <td style="padding: 10px;"><strong>SALDO FINAL</strong></td>
+                <td style="text-align: right; padding: 10px;"><span id="digitadoTotal"
+                    style="font-size: 1rem; font-weight: 800; color: var(--primary);">$ 0</span></td>
+                <td style="text-align: right; padding: 10px;"><span id="sistemaTotal"
+                    style="font-size: 1rem; font-weight: 800;">$ 0</span></td>
+                <td style="text-align: right; padding: 10px;"><span id="diffTotal"
+                    style="font-size: 1rem; font-weight: 800;">$ 0</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div id="listaEgresosCierre"
+          style="margin-top: 15px; font-size: 0.8rem; border-top: 1px dashed #cbd5e1; padding-top: 10px; display: none;">
+          <p style="font-weight: bold; margin-bottom: 5px; color: #475569;">Gastos registrados (puedes borrar si hubo un
+            error):</p>
+          <ul id="ulEgresosCierre"
+            style="list-style: none; padding: 0; display: flex; flex-direction: column; gap: 4px;"></ul>
+        </div>
+
+        <div
+          style="background: #f8fafc; padding: 12px; border-radius: 8px; margin-top: 15px; border: 1px solid #e2e8f0;">
+          <p style="font-size: 0.7rem; color: #64748b; margin: 0; line-height: 1.5;">
+            <strong>Nota de Auditoría:</strong><br>
+            - La columna <strong>"Reportado"</strong> es el dinero real que tienes. <br>
+            - El <strong>"Saldo Final"</strong> esperado es: (Base + Ventas - Gastos).
+          </p>
+        </div>
+      </div>
+
+      <footer class="modal-footer">
+        <button id="btnConfirmCerrar" class="btn primary">Cerrar caja</button>
+      </footer>
+    </form>
+  </dialog>
+
+
+  <!-- Modal Facturas -->
+  <dialog id="dlgFacturas" class="modal" style="max-width: 900px; width: 90%;">
+    <form method="dialog" class="modal-form">
+      <header class="modal-header">
+        <h3>Facturas Asociadas</h3>
+        <button type="button" class="modal-close" data-close="facturas">✕</button>
+      </header>
+      <div class="modal-body">
+        <div style="overflow-x: auto; max-height: 60vh;">
+          <table class="cajas-table" style="width: 100%;">
+            <thead>
+              <tr>
+                <th>Fecha/Hora</th>
+                <th>Nro Factura</th>
+                <th>Cliente</th>
+                <th>Medios de Pago</th>
+                <th style="text-align: right;">Total</th>
+              </tr>
+            </thead>
+            <tbody id="tbodyFacturas"></tbody>
+          </table>
+        </div>
+      </div>
+      <footer class="modal-footer">
+        <button type="button" class="btn secondary" data-close="facturas">Cerrar</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <!-- Modal Informe (Sustituye a Inventario) -->
+  <dialog id="dlgInforme" class="modal" style="max-width: 600px; width: 90%;">
+    <form method="dialog" class="modal-form">
+      <header class="modal-header">
+        <h3>Informe de Caja</h3>
+        <button type="button" class="modal-close" data-close="informe">✕</button>
+      </header>
+      <div class="modal-body">
+        <div id="informeContent">
+          <!-- Resumen de Totales -->
+          <div class="report-summary">
+            <div class="report-card">
+              <span class="report-label">Facturas Emitidas</span>
+              <span id="reportCount" class="report-value">0</span>
+            </div>
+            <div class="report-card primary">
+              <span class="report-label">Total en Caja (Efectivo)</span>
+              <span id="reportTotal" class="report-value">$ 0</span>
+            </div>
+          </div>
+
+          <h4 class="section-title">Listado de Facturas (IDs)</h4>
+          <div
+            style="max-height: 200px; overflow-y: auto; border: 1px solid var(--border-light); border-radius: 8px; margin-bottom: 20px;">
+            <table class="ventas-table">
+              <thead>
+                <tr>
+                  <th>Nro Factura</th>
+                  <th style="text-align: right;">Valor</th>
+                </tr>
+              </thead>
+              <tbody id="tbodyInformeFacturas"></tbody>
+            </table>
+          </div>
+
+          <h4 class="section-title" style="color: #e11d48;">Listado de GASTOS / Egresos</h4>
+          <div style="max-height: 200px; overflow-y: auto; border: 1px solid #fecaca; border-radius: 8px;">
+            <table class="ventas-table">
+              <thead>
+                <tr>
+                  <th>Descripción</th>
+                  <th style="text-align: right;">Valor</th>
+                </tr>
+              </thead>
+              <tbody id="tbodyInformeEgresos"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <footer class="modal-footer">
+        <button type="button" id="btnExcelInforme" class="btn secondary"
+          style="background-color: #ecfdf5; color: #059669; border-color: #10b981;">Descargar Excel</button>
+        <button type="button" id="btnPrintInforme" class="btn secondary">Imprimir</button>
+        <button type="button" class="btn primary" data-close="informe">Entendido</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <dialog id="dlgTicket" class="modal" style="max-width: 350px; font-family: 'Courier New', Courier, monospace;">
+    <div class="ticket-container">
+      <header class="ticket-header">
+        <h2 style="font-size: 1.2rem; margin-bottom: 5px;">COMPROBANTE DE CIERRE</h2>
+        <p id="ticketFecha" style="font-size: 0.8rem;"></p>
+        <p id="ticketResponsable" style="font-size: 0.8rem;"></p>
+        <hr style="border: 1px dashed #ccc; margin: 10px 0;">
+      </header>
+
+      <div class="ticket-body" style="font-size: 0.9rem;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+          <span>BASE INICIAL:</span>
+          <span id="ticketBase">$ 0</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+          <span>VENTAS (EFECTIVO):</span>
+          <span id="ticketVentas">$ 0</span>
+        </div>
+        <hr style="border: 1px dashed #ccc; margin: 10px 0;">
+        <div
+          style="display: flex; justify-content: space-between; font-weight: bold; font-size: 1.1rem; margin-bottom: 15px;">
+          <span>TOTAL ESPERADO:</span>
+          <span id="ticketTotal">$ 0</span>
+        </div>
+
+        <div id="ticketDetallePagos">
+          <!-- Detalle por medio de pago -->
+        </div>
+
+        <div style="display: flex; justify-content: space-between; margin-top: 5px; color: #e11d48; font-weight: bold;">
+          <span>(-) TOTAL EGRESOS:</span>
+          <span id="ticketEgresos">$ 0</span>
+        </div>
+        <div id="ticketDetalleEgresos" style="font-size: 0.8rem; color: #e11d48;">
+          <!-- Detalle de egresos -->
+        </div>
+
+        <hr style="border: 1px dashed #ccc; margin: 10px 0;">
+        <div style="display: flex; justify-content: space-between;">
+          <span>DIFERENCIA:</span>
+          <span id="ticketDiferencia">$ 0</span>
+        </div>
+      </div>
+
+      <footer class="ticket-footer" style="margin-top: 20px; text-align: center; font-size: 0.75rem;">
+        <p>*** FIN DEL COMPROBANTE ***</p>
+        <div class="no-print" style="margin-top: 15px; display: flex; gap: 10px; justify-content: center;">
+          <button type="button" id="btnPrintTicket" class="btn primary">Imprimir</button>
+          <button type="button" class="btn secondary" data-close="ticket">Cerrar</button>
+        </div>
+      </footer>
+    </div>
+  </dialog>
+
+  <script src="caja.js" type="module"></script>
+
+  <!-- Modal Registrar Egreso -->
+  <dialog id="dlgEgreso" class="modal">
+    <form method="dialog" id="formEgreso" class="modal-form">
+      <header class="modal-header">
+        <h3>Registrar Egreso / Gasto</h3>
+        <button type="button" class="modal-close" data-close="egreso">✕</button>
+      </header>
+      <div class="modal-body">
+        <label>Descripción del gasto *
+          <input id="egresoDescripcion" type="text" placeholder="Ej: Compra de café, Implementos..." required>
+        </label>
+        <label>Valor del gasto *
+          <input id="egresoValor" type="number" min="1" step="1" placeholder="0" required>
+        </label>
+      </div>
+      <footer class="modal-footer">
+        <button type="button" class="btn secondary" data-close="egreso">Cancelar</button>
+        <button id="btnGuardarEgreso" class="btn primary" style="background-color: #e11d48;">Guardar Gasto</button>
+      </footer>
+    </form>
+  </dialog>
+  <!-- Modal Editar Base Inicial -->
+  <dialog id="dlgEditarBase" class="modal">
+    <form method="dialog" id="formEditarBase" class="modal-form">
+      <header class="modal-header">
+        <h3>Editar Base Inicial</h3>
+        <button type="button" class="modal-close" data-close="editarBase">✕</button>
+      </header>
+      <div class="modal-body">
+        <label>Nuevo valor de la base inicial *
+          <input id="editarBaseNuevoValor" type="number" min="0" step="1" placeholder="0" required>
+        </label>
+        <p style="font-size: 0.8rem; color: #64748b; margin-top: 10px;">
+          Este cambio afectará directamente el total esperado de la caja actual.
+        </p>
+      </div>
+      <footer class="modal-footer">
+        <button type="button" class="btn secondary" data-close="editarBase">Cancelar</button>
+        <button id="btnGuardarEditarBase" class="btn primary">Guardar Cambios</button>
+      </footer>
+    </form>
+  </dialog>
+</body>
+
+</html>
