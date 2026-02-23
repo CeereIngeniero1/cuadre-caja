@@ -1,6 +1,6 @@
 # Documentación Técnica - Cuadre de Caja App
 
-Este proyecto es una herramienta de auditoría financiera diseñada para integrarse con la base de datos **Laureles3** de un sistema SIO (SQL Server). Su objetivo es permitir el cuadre de caja diario de los usuarios, conciliando valores manuales contra los registros del sistema.
+Este proyecto es una herramienta de auditoría financiera diseñada para integrarse con la base de datos **Naaturamerica2** de un sistema SIO (SQL Server). Su objetivo es permitir el cuadre de caja diario de los usuarios, conciliando valores manuales contra los registros del sistema.
 
 ---
 
@@ -163,7 +163,8 @@ El sistema calcula el dinero físico que **debería** haber en el cajón. Los me
 > **Esperado (Sistema)** = `(Base Inicial + Ventas en Efectivo) - Gastos (Egresos)`
 
 *   **Enfoque en Efectivo:** El objetivo es cuadrar el dinero real. Si falta dinero en Nequi o Bancolombia, eso se revisa en la fila correspondiente, pero no genera un "faltante de caja" físico.
-*   **Ventas en Efectivo:** Solo se suman las facturas pagadas con dinero contante y sonante.
+*   **Ventas en Efectivo (Lógica 00:00 AM):** Para asegurar que el ticket coincida con el sistema, la aplicación busca todas las ventas desde las **00:00:00 AM** del día de apertura. Esto captura ventas realizadas temprano en la mañana antes de abrir formalmente la caja en la app.
+*   **Protección de Duplicados:** El sistema ignora automáticamente ventas que ya pertenezcan a una caja cerrada previamente, permitiendo múltiples turnos al día sin errores.
 *   **Gastos (Egresos):** Se restan del total de efectivo disponible.
 *   **Sin duplicidad de Base:** El usuario reporta todo el dinero que tiene en la mano (incluyendo la base). El sistema compara ese total contra la meta calculada.
 

@@ -240,16 +240,17 @@ async function obtenerMovimientos(req, res, next) {
     } = infoCaja.recordset[0];
 
     const fechaInicioQuery = new Date(fechaInicio);
+    fechaInicioQuery.setHours(0, 0, 0, 0); // Siempre buscamos desde el inicio del día para capturar ventas previas a la apertura formal
+
     let fechaFinQuery;
 
     if (idEstado === ESTADO_CAJA_ABIERTA) {
-      // Si está abierta, buscamos desde el inicio del día para capturar facturas olvidadas
-      fechaInicioQuery.setHours(0, 0, 0, 0);
       fechaFinQuery = new Date();
     } else {
-      // Si está cerrada, solo su rango exacto
+      // Si está cerrada, su rango hasta el cierre
       fechaFinQuery = new Date(fechaFin || fechaInicio);
-      if (fechaFinQuery.getTime() === fechaInicioQuery.getTime()) {
+      // Caso borde: si inicio y fin son iguales (milisegundos), extendemos al final del día
+      if (fechaFinQuery.getTime() === new Date(fechaInicio).getTime()) {
         fechaFinQuery.setHours(23, 59, 59, 999);
       }
     }
@@ -432,14 +433,15 @@ async function obtenerFacturasCaja(req, res, next) {
     const { "Documento Usuario": docUsuario, "Fecha Inicio Caja": fIni, "Fecha Fin Caja": fFin, "Id Estado": idEstado } = infoCaja.recordset[0];
 
     const fechaInicioQuery = new Date(fIni);
+    fechaInicioQuery.setHours(0, 0, 0, 0); // Consistencia: siempre buscamos desde el inicio del día
+
     let fechaFinQuery;
 
     if (idEstado === ESTADO_CAJA_ABIERTA) {
-      fechaInicioQuery.setHours(0, 0, 0, 0);
       fechaFinQuery = new Date();
     } else {
       fechaFinQuery = new Date(fFin || fIni);
-      if (fechaFinQuery.getTime() === fechaInicioQuery.getTime()) {
+      if (fechaFinQuery.getTime() === new Date(fIni).getTime()) {
         fechaFinQuery.setHours(23, 59, 59, 999);
       }
     }

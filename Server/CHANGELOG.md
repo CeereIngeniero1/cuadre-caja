@@ -4,6 +4,17 @@ Este documento detalla las mejoras y correcciones realizadas al sistema de Cuadr
 
 ---
 
+## [1.5.0] - 2026-02-23
+
+### 🔧 Corrección Crítica: Discrepancia en Ticket e Informes
+- **Unificación de Rango de Búsqueda:** Se modificó la lógica para que el ticket y los informes busquen ventas siempre desde las **00:00:00 AM** de la fecha de apertura. 
+- **Consistencia Retroactiva:** El cambio permite que cajas cerradas en el pasado ahora muestren los valores correctos al visualizar el ticket nuevamente.
+
+### ⚙️ Configuración
+- **Actualización de Base de Datos:** Se actualizó la conexión por defecto en el `.env` para apuntar a la base de datos `Naaturamerica2`.
+
+---
+
 ## [1.4.1] - 2026-01-27
 
 ### 🕒 Corrección de Tiempos y Zona Horaria
