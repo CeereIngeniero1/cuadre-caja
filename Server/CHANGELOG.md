@@ -4,6 +4,19 @@ Este documento detalla las mejoras y correcciones realizadas al sistema de Cuadr
 
 ---
 
+## [1.5.2] - 2026-03-03
+
+### 🖨️ Mejora: Ticket Térmico sin Espacio en Blanco
+- **Problema:** La impresora térmica imprimía una tira larga con espacio en blanco al final del ticket.
+- **Solución:** Se cambió `size: auto` por `size: 80mm auto` en el `@media print` del CSS.
+- **Nota:** Complementar configurando el papel como `80mm` en las preferencias de la impresora térmica en Windows.
+
+### 🧹 Limpieza de Código
+- Se eliminaron scripts de diagnóstico (`check-states.js`, `examine_schema.js`, `test-db.js`, `discover_schema.js`, `CAMBIOS.txt`).
+- Se eliminó la función `obtenerResumenCaja` y su ruta `/resumen` (stub vacío sin implementación).
+
+---
+
 ## [1.5.1] - 2026-03-03
 
 ### 🔧 Corrección Crítica: Facturas Anuladas se Contaban en el Cuadre

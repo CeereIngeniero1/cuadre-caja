@@ -61,6 +61,7 @@ El archivo `.env` en la raíz debe contener las siguientes variables para la con
 - `DB_CAJA_TIPO_ITEM_APERTURA`: ID(s) del tipo de ítem usado para la base inicial (separados por comas).
 - `DB_CAJA_DOCUMENTO_EMPRESA`: **(Opcional)** NIT o Documento de la empresa para la apertura de cajas.
 - `DB_CAJA_TERMINAL_DEFAULT`: **(Opcional)** ID de la terminal física por defecto si no se especifica.
+- `DB_CAJA_ESTADO_ANULADA_FACTURA`: ID del estado "Anulado" en `[Factura]` (Default: `5`). Las facturas con este estado se excluyen de todos los cálculos.
 
 > **Nota de Portabilidad:** Gracias a estas variables, puede conectar esta aplicación a cualquier otra base de datos SIO (ej: `Laureles4`, `OtraEmpresaDB`) simplemente ajustando los credenciales y los IDs de configuración, sin necesidad de modificar el código fuente.
 
@@ -141,7 +142,8 @@ El sistema permite registrar salidas de dinero durante el turno para justificar 
 
 ## Informes y Tickets
 
--   **Ticket de Cierre:** Optimizado para impresoras térmicas con **fuentes de alto contraste (Negrita/Negro Puro)** y tipografía monoespaciada para asegurar legibilidad perfecta.
+-   **Ticket de Cierre:** Optimizado para impresoras térmicas con **fuentes de alto contraste (Negrita/Negro Puro)** y tipografía monoespaciada para asegurar legibilidad perfecta. El CSS usa `size: 80mm auto` para evitar espacio en blanco al final de la impresión.
+-   **Configuración de Impresora:** Para mejores resultados, configurar el papel como `80mm` en las preferencias de la impresora térmica en Windows.
 -   **Informe en Pantalla:** Modal que permite verificar la "Base Inicial" y visualizar todas las facturas del turno.
 -   **Exportación a Excel:** Genera un archivo `.csv` compatible con Excel con el detalle completo de movimientos.
 
@@ -164,6 +166,7 @@ El sistema calcula el dinero físico que **debería** haber en el cajón. Los me
 
 *   **Enfoque en Efectivo:** El objetivo es cuadrar el dinero real. Si falta dinero en Nequi o Bancolombia, eso se revisa en la fila correspondiente, pero no genera un "faltante de caja" físico.
 *   **Ventas en Efectivo (Lógica 00:00 AM):** Para asegurar que el ticket coincida con el sistema, la aplicación busca todas las ventas desde las **00:00:00 AM** del día de apertura. Esto captura ventas realizadas temprano en la mañana antes de abrir formalmente la caja en la app.
+*   **Exclusión de Facturas Anuladas:** El sistema filtra automáticamente facturas con estado `Anulado` (`Id Estado = 5` por defecto, configurable vía `.env`). Esto evita que reversa o anulaciones inflen el monto esperado en caja.
 *   **Protección de Duplicados:** El sistema ignora automáticamente ventas que ya pertenezcan a una caja cerrada previamente, permitiendo múltiples turnos al día sin errores.
 *   **Gastos (Egresos):** Se restan del total de efectivo disponible.
 *   **Sin duplicidad de Base:** El usuario reporta todo el dinero que tiene en la mano (incluyendo la base). El sistema compara ese total contra la meta calculada.
@@ -244,4 +247,18 @@ JOIN [dbo].[Recibo de CajaII] rcii ON rc.[Id Recibo de Caja] = rcii.[Id Recibo d
 WHERE f.[No Factura] = 'NUMERO_FACTURA';
 ```
 
+### Verificar facturas anuladas que afectaban el cuadre de un cajero
 
+Útil para auditar qué días y qué montos se estaban inflando antes del fix de v1.5.1:
+
+```sql
+SELECT 
+    f.[Documento Usuario],
+    CAST(f.[Fecha Factura] AS DATE) AS Fecha,
+    COUNT(*) AS CantidadAnuladas,
+    SUM(f.[Total Factura]) AS TotalAnulado
+FROM [dbo].[Factura] f
+WHERE f.[Id Estado] = 5  -- Anulado
+GROUP BY f.[Documento Usuario], CAST(f.[Fecha Factura] AS DATE)
+ORDER BY Fecha DESC;
+```
