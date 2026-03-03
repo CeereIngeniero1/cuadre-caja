@@ -4,6 +4,15 @@ Este documento detalla las mejoras y correcciones realizadas al sistema de Cuadr
 
 ---
 
+## [1.5.1] - 2026-03-03
+
+### 🔧 Corrección Crítica: Facturas Anuladas se Contaban en el Cuadre
+- **Problema:** Las facturas con estado "Anulado" (`Id Estado = 5`) seguían siendo sumadas en los totales de la caja, causando diferencias entre el dinero físico y el reporte.
+- **Solución:** Se añadió el filtro `AND f.[Id Estado] <> @estadoAnulada` en las consultas `obtenerMovimientos` y `obtenerFacturasCaja`.
+- **Configuración:** Se añadió la variable `DB_CAJA_ESTADO_ANULADA_FACTURA=5` al `.env` para que el ID del estado sea configurable por cliente.
+
+---
+
 ## [1.5.0] - 2026-02-23
 
 ### 🔧 Corrección Crítica: Discrepancia en Ticket e Informes

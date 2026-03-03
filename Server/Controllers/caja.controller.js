@@ -22,6 +22,13 @@ const APERTURA_ITEM_TYPES = (process.env.DB_CAJA_TIPO_ITEM_APERTURA || "")
 
 const EGRESO_ITEM_TYPE = Number(process.env.DB_CAJA_TIPO_ITEM_EGRESO || 7);
 
+/**
+ * ID del estado "Anulado" en la tabla Factura.
+ * Las facturas con este estado se excluyen de todos los cálculos de caja.
+ */
+const ESTADO_ANULADA_FACTURA = Number(process.env.DB_CAJA_ESTADO_ANULADA_FACTURA ?? 5);
+
+
 function buildListadoQuery({ whereClause = "", orderClause = "ORDER BY c.[Fecha Inicio Caja] DESC" } = {}) {
   const filtroTotalInicial =
     APERTURA_ITEM_TYPES.length > 0
@@ -264,6 +271,7 @@ async function obtenerMovimientos(req, res, next) {
       .input("fechaFin", sql.DateTime, fechaFinQuery)
       .input("idCaja", sql.Int, idCaja)
       .input("estadoCerrada", sql.Int, ESTADO_CAJA_CERRADA)
+      .input("estadoAnulada", sql.Int, ESTADO_ANULADA_FACTURA)
       .query(`
         WITH Payments AS (
           SELECT 
@@ -291,6 +299,8 @@ async function obtenerMovimientos(req, res, next) {
         WHERE RTRIM(LTRIM(f.[Documento Usuario])) = RTRIM(LTRIM(@docUsuario))
           AND f.[Fecha Factura] >= @fechaInicio
           AND f.[Fecha Factura] <= @fechaFin
+          -- EXCLUIR facturas anuladas
+          AND f.[Id Estado] <> @estadoAnulada
           -- No incluir facturas que ya estén en una caja CERRADA previa
           AND NOT EXISTS (
             SELECT 1 FROM [dbo].[Caja] c2
@@ -455,6 +465,7 @@ async function obtenerFacturasCaja(req, res, next) {
       .input("fechaFin", sql.DateTime, fechaFinQuery)
       .input("idCaja", sql.Int, idCaja)
       .input("estadoCerrada", sql.Int, ESTADO_CAJA_CERRADA)
+      .input("estadoAnulada", sql.Int, ESTADO_ANULADA_FACTURA)
       .query(`
         -- [COMPATIBILIDAD SQL 2014]
         -- Se ha eliminado STRING_AGG (SQL 2017+) y se usa FOR XML PATH para concatenar strings.
@@ -491,6 +502,8 @@ async function obtenerFacturasCaja(req, res, next) {
         WHERE RTRIM(LTRIM(f.[Documento Usuario])) = RTRIM(LTRIM(@docUsuario))
           AND f.[Fecha Factura] >= @fechaInicio
           AND f.[Fecha Factura] <= @fechaFin
+          -- EXCLUIR facturas anuladas
+          AND f.[Id Estado] <> @estadoAnulada
           -- Filtramos para asegurar que tenga pagos (equivalente al INNER JOIN original)
           AND EXISTS (SELECT 1 FROM Payments p WHERE p.[Id Factura] = f.[Id Factura])
           AND NOT EXISTS (
