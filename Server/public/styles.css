@@ -436,7 +436,8 @@ input:focus {
 @media print {
   @page {
     margin: 0;
-    size: auto;
+    size: 80mm auto;
+    /* Papel térmico: 80mm de ancho, largo según contenido */
   }
 
   body {
