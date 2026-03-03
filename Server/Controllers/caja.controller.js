@@ -85,16 +85,6 @@ function mapearCaja(row) {
   };
 }
 
-async function obtenerResumenCaja(req, res, next) {
-  try {
-    const pool = await poolPromise;
-    const resultado = { recordset: [{ timestamp: new Date() }] };
-    res.json({ ok: true, data: resultado.recordset[0] });
-  } catch (error) {
-    next(error);
-  }
-}
-
 async function listarCajas(_req, res, next) {
   const pool = await poolPromise;
   const query = buildListadoQuery();
@@ -712,7 +702,6 @@ module.exports = {
   obtenerMovimientos,
   obtenerFacturasCaja,
   cerrarCaja,
-  obtenerResumenCaja,
   registrarEgreso,
   obtenerInventarioCaja,
   actualizarBase,

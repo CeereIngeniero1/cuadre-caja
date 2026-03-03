@@ -1,6 +1,5 @@
 const express = require("express");
 const {
-  obtenerResumenCaja,
   listarCajas,
   abrirCaja,
   obtenerMovimientos,
@@ -14,7 +13,7 @@ const {
 
 const router = express.Router();
 
-router.get("/resumen", obtenerResumenCaja);
+
 router.get("/", listarCajas);
 router.post("/", abrirCaja);
 router.get("/:id/movimientos", obtenerMovimientos);
